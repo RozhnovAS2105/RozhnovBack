@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using RozhnovBack.Data;
 using RozhnovBack.Models;
@@ -20,12 +22,14 @@ namespace RozhnovBack.Controllers
         private static List<Reservation> Reservations = new List<Reservation>();
 
         [HttpGet]
+        [Authorize(Roles = "admin")]
         public IActionResult GetAllReservations()
         {
             return Ok(Reservations);
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public IActionResult GetReservationById(int id)
         {
             var reservation = Reservations.FirstOrDefault(r => r.Id == id);
@@ -33,6 +37,7 @@ namespace RozhnovBack.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public IActionResult CreateReservation([FromBody] Reservation reservation)
         {
             reservation.Id = Reservations.Any() ? Reservations.Max(r => r.Id) + 1 : 1;
@@ -41,6 +46,7 @@ namespace RozhnovBack.Controllers
         }
 
         [HttpGet("guest/{guestId}")]
+        [Authorize(Roles = "admin")]
         public IActionResult GetReservationsByGuest(int guestId)
         {
             var guestReservations = Reservations.Where(r => r.GuestId == guestId).ToList();
@@ -56,6 +62,7 @@ namespace RozhnovBack.Controllers
                 }*/
 
         [HttpGet("available-rooms")]
+        [Authorize]
         public IActionResult GetAvailableRooms()
         {
             var availableRooms = RoomService.Rooms.Where(r => !r.IsOccupied).ToList();

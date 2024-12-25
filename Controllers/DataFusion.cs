@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RozhnovBack.Data;
 using RozhnovBack.Models;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RozhnovBack.Controllers
 {
@@ -22,6 +24,7 @@ namespace RozhnovBack.Controllers
 
         // Получение всех бронирований с деталями номеров (объединение Reservation и Room)
         [HttpGet("reservations-with-rooms")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetReservationsWithRoomDetails()
         {
             var result = from reservation in _context.Reservation
@@ -41,6 +44,7 @@ namespace RozhnovBack.Controllers
 
         // Получение всех доступных номеров
         [HttpGet("available-rooms")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAvailableRooms()
         {
             var availableRooms = from room in _context.Room
@@ -57,6 +61,7 @@ namespace RozhnovBack.Controllers
 
         // Получение всех бронирований для конкретного гостя с деталями номеров
         [HttpGet("guest/{guestId}/reservations")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetGuestReservations(int guestId)
         {
             var guestReservations = from reservation in _context.Reservation

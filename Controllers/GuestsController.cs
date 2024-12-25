@@ -28,12 +28,18 @@ namespace RozhnovBack.Controllers
 
         [HttpGet("{id}")]
         [Authorize]
+        //[Authorize(Roles = "admin")]
         public IActionResult GetGuestById(int id)
         {
             var guest = Guests.FirstOrDefault(g => g.Id == id);
-            if (guest != null) return NotFound("Guest not found");
 
- // Проверяем, является ли пользователь авторизованным гостем или админом
+            // Если гость не найден, возвращаем NotFound
+            if (guest == null)
+            {
+                return NotFound("Guest not found");
+            }
+
+            // Проверяем, является ли пользователь авторизованным гостем или админом
             if (User.Identity.Name != guest.Name && !User.IsInRole("admin"))
             {
                 return Unauthorized("You are not authorized to view this guest's information.");
@@ -42,12 +48,21 @@ namespace RozhnovBack.Controllers
             return Ok(guest);
         }
 
+
         [HttpPost]
-        [Authorize(Roles = "admin")]
+        [Authorize]
+        //[Authorize(Roles = "admin")]
         public IActionResult CreateGuest([FromBody] Guest guest)
         {
+            var existingGuest = Guests.FirstOrDefault(g => g.Name == guest.Name);
+            if (existingGuest != null)
+            {
+                return BadRequest("Guest is already registered.");
+            }
+
             guest.Id = Guests.Any() ? Guests.Max(g => g.Id) + 1 : 1;
             Guests.Add(guest);
+
             return CreatedAtAction(nameof(GetGuestById), new { id = guest.Id }, guest);
         }
 

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using RozhnovBack.Data;
 using RozhnovBack.Models;
 
@@ -23,12 +25,14 @@ namespace RozhnovBack.Controllers
                 };*/
 
         [HttpGet]
+        [Authorize]
         public IActionResult GetAllRooms()
         {
             return Ok(RoomService.Rooms);
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public IActionResult GetRoomById(int id)
         {
             var room = RoomService.Rooms.FirstOrDefault(r => r.Id == id);
@@ -36,6 +40,7 @@ namespace RozhnovBack.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult CreateRoom([FromBody] Room room)
         {
             room.Id = RoomService.Rooms.Max(r => r.Id) + 1;
@@ -44,6 +49,7 @@ namespace RozhnovBack.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
         public IActionResult UpdateRoom(int id, [FromBody] Room updatedRoom)
         {
             var room = RoomService.Rooms.FirstOrDefault(r => r.Id == id);
@@ -57,6 +63,7 @@ namespace RozhnovBack.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         public IActionResult DeleteRoom(int id)
         {
             var room = RoomService.Rooms.FirstOrDefault(r => r.Id == id);
