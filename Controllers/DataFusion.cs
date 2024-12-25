@@ -16,7 +16,6 @@ namespace RozhnovBack.Controllers
     {
         private readonly RozhnovBackContext _context;
 
-        // Конструктор контроллера
         public DataFusion(RozhnovBackContext context)
         {
             _context = context;
@@ -28,7 +27,8 @@ namespace RozhnovBack.Controllers
         public async Task<IActionResult> GetReservationsWithRoomDetails()
         {
             var result = from reservation in _context.Reservation
-                         join room in _context.Room on reservation.RoomId equals room.Id
+            //объединение двух таблиц, сопостовляя ID комнат.
+                         join room in _context.Room on reservation.RoomId equals room.Id //encude
                          select new
                          {
                              ReservationId = reservation.Id,
@@ -38,8 +38,18 @@ namespace RozhnovBack.Controllers
                              CheckInDate = reservation.CheckInDate,
                              CheckOutDate = reservation.CheckOutDate
                          };
+            var resultList = await result.ToListAsync();
+            // Проверяем, если результат пуст, возвращаем NotFound с сообщением
+            if (!resultList.Any())
+            {
+                return NotFound("No reservations found.");
+            }
 
-            return Ok(await result.ToListAsync());
+            // Если данные есть, возвращаем их как успешный ответ
+            return Ok(resultList);
+
+
+            //return Ok(await result.ToListAsync());
         }
 
         // Получение всех доступных номеров
