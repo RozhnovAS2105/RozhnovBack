@@ -75,7 +75,7 @@ namespace RozhnovBack.Controllers
 
         [HttpGet("search")]
         [Authorize]
-        public IActionResult SearchRooms([FromQuery] string type,
+        public IActionResult SearchRooms([FromQuery] string? type,
             [FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice,
             [FromQuery] bool? isOccupied,
             [FromQuery] DateTime? bookingStartDate,
